@@ -6,6 +6,7 @@ import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.security.UserDetailsImpl;
 import com.sparta.myselectshop.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,17 +22,26 @@ public class ProductController {
     public ProductResponseDto createProduct(@RequestBody ProductRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return productService.createProduct(requestDto, userDetails.getUser());
     }
+
     @PutMapping("/products/{id}")
     public ProductResponseDto updateProduct(@PathVariable Long id, @RequestBody ProductMypriceRequestDto requestDto) {
         return productService.updateProduct(id, requestDto);
     }
-    @GetMapping("/products")
-    public List<ProductResponseDto> getProducts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return productService.getProducts(userDetails.getUser());
-    }
 
-    @GetMapping("/admin/products")
-    private List<ProductResponseDto> getAllProducts() {
-        return productService.getAllProducts();
+    @GetMapping("/products")
+    public Page<ProductResponseDto> getProducts(
+            @RequestParam("page") int page, //1부터시작하기 때문에 -1하고 사용
+            @RequestParam("size") int size,
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("isAsc") boolean isAsce,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return productService.getProducts(userDetails.getUser(),
+                page - 1, size, sortBy, isAsce
+        );
     }
+//
+//    @GetMapping("/admin/products")
+//    private List<ProductResponseDto> getAllProducts() {
+//        return productService.getAllProducts();
+//    }
 }
