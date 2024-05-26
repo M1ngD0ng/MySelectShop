@@ -33,10 +33,10 @@ public class ProductController {
             @RequestParam("page") int page, //1부터시작하기 때문에 -1하고 사용
             @RequestParam("size") int size,
             @RequestParam("sortBy") String sortBy,
-            @RequestParam("isAsc") boolean isAsce,
+            @RequestParam("isAsc") boolean isAsc,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return productService.getProducts(userDetails.getUser(),
-                page - 1, size, sortBy, isAsce
+                page - 1, size, sortBy, isAsc
         );
     }
 
@@ -44,5 +44,23 @@ public class ProductController {
     public void addFolder(@PathVariable Long productId, @RequestParam Long folderId
             , @AuthenticationPrincipal UserDetailsImpl userDetails) {
         productService.addFolder(productId, folderId, userDetails.getUser());
+    }
+
+    @GetMapping("/folders/{folderId}/products")
+    public Page<ProductResponseDto> getProductsInFolder(
+            @PathVariable Long folderId,
+            @RequestParam("page") int page, //1부터시작하기 때문에 -1하고 사용
+            @RequestParam("size") int size,
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("isAsc") boolean isAsc,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return productService.getProductsInFolder(
+                folderId,
+                page-1,
+                size,
+                sortBy,
+                isAsc,
+                userDetails.getUser()
+        );
     }
 }

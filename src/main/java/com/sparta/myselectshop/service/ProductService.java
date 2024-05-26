@@ -48,8 +48,8 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponseDto> getProducts(User user, int page, int size, String sortBy, boolean isAsce) {
-        Sort.Direction direction = isAsce ? Sort.Direction.ASC : Sort.Direction.DESC;
+    public Page<ProductResponseDto> getProducts(User user, int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
@@ -57,9 +57,9 @@ public class ProductService {
 
         Page<Product> productList;
 
-        if(userRoleEnum == UserRoleEnum.USER){
+        if (userRoleEnum == UserRoleEnum.USER) {
             productList = productRepository.findAllByUser(user, pageable);
-        } else{
+        } else {
             productList = productRepository.findAll(pageable);
         }
         return productList.map(ProductResponseDto::new);
@@ -74,20 +74,33 @@ public class ProductService {
 
     public void addFolder(Long productId, Long folderId, User user) {
         Product product = productRepository.findById(productId).orElseThrow(
-                ()-> new NullPointerException("해당 상품이 존재하지 않습니다.")
+                () -> new NullPointerException("해당 상품이 존재하지 않습니다.")
         );
-        Folder folder =folderRepository.findById(folderId).orElseThrow(
-                ()-> new NullPointerException("해당 폴더가 존재하지 않습니다")
+        Folder folder = folderRepository.findById(folderId).orElseThrow(
+                () -> new NullPointerException("해당 폴더가 존재하지 않습니다")
         );
 
-        if (!product.getUser().getId().equals(user.getId()) || !folder.getUser().getId().equals(user.getId())){
+        if (!product.getUser().getId().equals(user.getId()) || !folder.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("회원님의 관심 상품이 아니거나, 회원님의 폴더가 아닙니다.");
         }
 
         Optional<ProductFolder> overlapFolder = productFolderRepository.findByProductAndFolder(product, folder);
-        if(overlapFolder.isPresent()){
+        if (overlapFolder.isPresent()) {
             throw new IllegalArgumentException("중복된 폴더입니다.");
         }
         productFolderRepository.save(new ProductFolder(product, folder));
+    }
+
+    public Page<ProductResponseDto> getProductsInFolder(Long folderId, int page, int size, String sortBy, boolean isAsc, User user) {
+
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Product> productList = productRepository.findAllByUserAndProductFolderList_FolderId(user, folderId, pageable);
+
+        Page<ProductResponseDto> responseDtoList = productList.map(ProductResponseDto::new);
+
+        return responseDtoList;
     }
 }
