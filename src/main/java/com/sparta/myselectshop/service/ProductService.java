@@ -44,6 +44,7 @@ public class ProductService {
         return new ProductResponseDto(product);
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductResponseDto> getProducts(User user, int page, int size, String sortBy, boolean isAsce) {
         Sort.Direction direction = isAsce ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
@@ -58,13 +59,6 @@ public class ProductService {
         } else{
             productList = productRepository.findAll(pageable);
         }
-//
-//        List<Product> productList = productRepository.findAllByUser(user);
-//        List<ProductResponseDto> responseDtoList = new ArrayList<>();
-//
-//        for (Product product : productList) {
-//            responseDtoList.add(new ProductResponseDto(product));
-//        }
         return productList.map(ProductResponseDto::new);
     }
 
@@ -74,14 +68,4 @@ public class ProductService {
                 new NullPointerException("해당 상품은 존재하지 않습니다."));
         product.updateByItemDto(itemDto);
     }
-
-//    public List<ProductResponseDto> getAllProducts() {
-//        List<Product> productList = productRepository.findAll();
-//        List<ProductResponseDto> responseDtoList = new ArrayList<>();
-//
-//        for (Product product : productList) {
-//            responseDtoList.add(new ProductResponseDto(product));
-//        }
-//        return responseDtoList;
-//    }
 }
