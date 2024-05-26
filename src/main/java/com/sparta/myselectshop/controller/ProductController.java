@@ -39,9 +39,10 @@ public class ProductController {
                 page - 1, size, sortBy, isAsce
         );
     }
-//
-//    @GetMapping("/admin/products")
-//    private List<ProductResponseDto> getAllProducts() {
-//        return productService.getAllProducts();
-//    }
+
+    @PostMapping("/products/{productId}/folder")
+    public void addFolder(@PathVariable Long productId, @RequestParam Long folderId
+            , @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        productService.addFolder(productId, folderId, userDetails.getUser());
+    }
 }
