@@ -16,16 +16,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final FolderRepository folderRepository;
     private final ProductFolderRepository productFolderRepository;
+    private final FolderRepository folderRepository;
 
     public static final int MIN_MY_PRICE = 100;
 
